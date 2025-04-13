@@ -4,7 +4,7 @@ Installation of Amazon Q varies per platform.
 
 * [macOS](./macos.md)
 * [Linux](./linux.md)
-* Windows is not currently supported
+* [Windows (via WSL 2)](./windows.md)
 
 ## Installing Amazon Q for use over SSH
 
