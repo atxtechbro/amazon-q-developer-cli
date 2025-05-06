@@ -1,10 +1,56 @@
 # Amazon Q Development Guidelines
 
+This document stores learning notes about MCP implementation in this application. It's more about learning and note-taking than style and guidance.
+
+Whenever new MCP knowledge is obtained or "aha moments" about its implementation are discovered, add those insights here. Any MCP-related findings should trigger notes and refinement of this document. Keep the total file under 300 lines to maintain focus on the most valuable information.
+
 Always follow these guidelines when assisting in development for the Amazon Q CLI.
 
-## AmazonQ.md
+## MCP (Model Context Protocol) Usage
 
-DO NOT create or modify an AmazonQ.md file unless I explicitly tell you to do so.
+The MCP functionality in Amazon Q CLI has the following characteristics:
+
+1. The `mcp_client` crate exists and has functionality for interacting with MCP servers, but there's no dedicated CLI command to manage them.
+
+2. MCP servers load correctly during chat initialization:
+   ```
+   ✓ test loaded in 0.02 s
+   ✓ github loaded in 0.02 s
+   ✓ 2 of 2 mcp servers initialized
+   ```
+
+3. The command `q mcp list` doesn't exist in the CLI interface.
+
+4. To use MCP tools, you need to:
+   - Use them within `q chat` sessions
+   - Use the `/tools` command within chat to see available tools
+   - Use the `/prompts` command within chat to see available prompts from MCP servers
+
+5. The MCP functionality is designed to be used within the chat interface rather than through a separate CLI command.
+
+Example output from `/prompts` and `/tools` commands:
+```
+> /prompts
+
+Prompt                                         Arguments (* = required)
+▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+
+> /tools
+
+Tool                      Permission
+▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔Built-in:
+- fs_write                * not trusted
+- use_aws                 * trust read-only commands
+- report_issue            * trusted
+- fs_read                 * trusted
+- execute_bash            * trust read-only commands
+
+test (MCP):
+- test___test_hello       * not trusted
+
+github (MCP):
+- github___github_info    * not trusted
+```
 
 ## Rust Best Practices
 
@@ -34,43 +80,3 @@ BEFORE committing a change, ALWAYS do the following steps:
 
 All commit messages should follow the [Conventional Commits](https://www.conventionalcommits.org/) specification and include best practices:
 
-```
-<type>[optional scope]: <description>
-
-[optional body]
-
-[optional footer(s)]
-
-🤖 Assisted by [Amazon Q Developer](https://aws.amazon.com/q/developer)
-```
-
-Types:
-- feat: A new feature
-- fix: A bug fix
-- docs: Documentation only changes
-- style: Changes that do not affect the meaning of the code
-- refactor: A code change that neither fixes a bug nor adds a feature
-- perf: A code change that improves performance
-- test: Adding missing tests or correcting existing tests
-- chore: Changes to the build process or auxiliary tools
-- ci: Changes to CI configuration files and scripts
-
-Best practices:
-- Use the imperative mood ("add" not "added" or "adds")
-- Don't end the subject line with a period
-- Limit the subject line to 50 characters
-- Capitalize the subject line
-- Separate subject from body with a blank line
-- Use the body to explain what and why vs. how
-- Wrap the body at 72 characters
-
-Example:
-```
-feat(lambda): Add Go implementation of DDB stream forwarder
-
-Replace Node.js Lambda function with Go implementation to reduce cold
-start times. The new implementation supports forwarding to multiple SQS
-queues and maintains the same functionality as the original.
-
-🤖 Assisted by [Amazon Q Developer](https://aws.amazon.com/q/developer)
-```
